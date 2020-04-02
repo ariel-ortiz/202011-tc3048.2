@@ -142,7 +142,7 @@ public class Driver {
         try {
             parser.Prog();
             Console.WriteLine("Syntax OK!");
-
+        
         } catch (SyntaxError) {
             Console.WriteLine("Bad Syntax!");
 		}
