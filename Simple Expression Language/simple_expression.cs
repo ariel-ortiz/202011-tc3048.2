@@ -89,9 +89,9 @@ public class Parser {
             Token current = tokenStream.Current;
             tokenStream.MoveNext();
             return current;
-	} else {
+        } else {
             throw new SyntaxError();
-	}
+        }
     }
 
     public void Prog() {
