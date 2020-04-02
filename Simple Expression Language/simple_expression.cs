@@ -78,60 +78,60 @@ public class Parser {
     public Parser(IEnumerator<Token> tokenStream) {
         this.tokenStream = tokenStream;
         this.tokenStream.MoveNext();
-	}
+    }
 
     public TokenCategory Current {
         get { return tokenStream.Current.Category; }
-	}
+    }
 
     public Token Expect(TokenCategory category) {
         if (Current == category) {
             Token current = tokenStream.Current;
             tokenStream.MoveNext();
             return current;
-		} else {
+	} else {
             throw new SyntaxError();
-		}
 	}
+    }
 
     public void Prog() {
         Exp();
         Expect(TokenCategory.EOF);
-	}
+    }
 
     public void Exp() {
         Term();
         while (Current == TokenCategory.PLUS) {
             Expect(TokenCategory.PLUS);
             Term();
-		}
-	}
+        }
+    }
 
     public void Term() {
         Fact();
         while (Current == TokenCategory.TIMES) {
             Expect(TokenCategory.TIMES);
             Fact();
-		}
-	}
+        }
+    }
 
     public void Fact() {
         switch(Current) {
 
-            case TokenCategory.INT:
-                Expect(TokenCategory.INT);
-                break;
+        case TokenCategory.INT:
+            Expect(TokenCategory.INT);
+            break;
 
-            case TokenCategory.OPEN_PAR:
-                Expect(TokenCategory.OPEN_PAR);
-                Exp();
-                Expect(TokenCategory.CLOSE_PAR);
-                break;
+        case TokenCategory.OPEN_PAR:
+            Expect(TokenCategory.OPEN_PAR);
+            Exp();
+            Expect(TokenCategory.CLOSE_PAR);
+            break;
 
-            default:
-                throw new SyntaxError();
-		}
-	}
+        default:
+            throw new SyntaxError();
+        }
+    }
 }
 
 public class Driver {
@@ -145,6 +145,6 @@ public class Driver {
         
         } catch (SyntaxError) {
             Console.WriteLine("Bad Syntax!");
-		}
+        }
     }
 }
