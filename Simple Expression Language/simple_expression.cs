@@ -244,6 +244,84 @@ public class EvalVisitor {
     }
 }
 
+public class LispVisitor {
+    public String Visit(Prog node) {
+        return Visit((dynamic) node[0]);
+    }
+
+    public String Visit(Plus node) {
+        return "(+ "
+            + Visit((dynamic) node[0])
+            + " "
+            + Visit((dynamic) node[1])
+            + ")";
+    }
+
+    public String Visit(Times node) {
+        return "(* "
+            + Visit((dynamic) node[0])
+            + " "
+            + Visit((dynamic) node[1])
+            + ")";
+    }
+
+    public String Visit(Pow node) {
+        return "(expt "
+            + Visit((dynamic) node[0])
+            + " "
+            + Visit((dynamic) node[1])
+            + ")";
+    }
+
+    public String Visit(Int node) {
+        return node.AnchorToken.Lexeme;
+    }
+}
+
+public class CLangVisitor {
+    public String Visit(Prog node) {
+        return @"
+#include <stdio.h>
+#include <math.h>
+
+int main(void) {
+    printf(""%d\n"","
+        + Visit((dynamic) node[0])
+        + @");
+    return 0;
+}
+";
+    }
+
+    public String Visit(Plus node) {
+        return "("
+            + Visit((dynamic) node[0])
+            + "+"
+            + Visit((dynamic) node[1])
+            + ")";
+    }
+
+    public String Visit(Times node) {
+        return "("
+            + Visit((dynamic) node[0])
+            + "*"
+            + Visit((dynamic) node[1])
+            + ")";
+    }
+
+    public String Visit(Pow node) {
+        return "(int) pow("
+            + Visit((dynamic) node[0])
+            + ", "
+            + Visit((dynamic) node[1])
+            + ")";
+    }
+
+    public String Visit(Int node) {
+        return node.AnchorToken.Lexeme;
+    }
+}
+
 public class Driver {
     public static void Main() {
         Console.Write("> ");
@@ -253,6 +331,8 @@ public class Driver {
             var result = parser.Prog();
             // Console.WriteLine(result.ToStringTree());
             Console.WriteLine(new EvalVisitor().Visit((dynamic) result));
+            Console.WriteLine(new LispVisitor().Visit((dynamic) result));
+            Console.WriteLine(new CLangVisitor().Visit((dynamic) result));
         
         } catch (SyntaxError) {
             Console.WriteLine("Bad Syntax!");
