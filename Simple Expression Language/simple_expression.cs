@@ -78,6 +78,11 @@ public class Scanner {
 
 public class SyntaxError : Exception { }
 
+public class SemanticError : Exception {
+
+    public SemanticError(String message): base(message) { }
+}
+
 public class Parser {
     IEnumerator<Token> tokenStream;
 
@@ -322,6 +327,36 @@ int main(void) {
     }
 }
 
+public class SemanticVisitor {
+
+    public void Visit(Prog node) {
+        Visit((dynamic) node[0]);
+    }
+
+    public void Visit(Plus node) {
+        Visit((dynamic) node[0]);
+        Visit((dynamic) node[1]);
+    }
+
+    public void Visit(Times node) {
+        Visit((dynamic) node[0]);
+        Visit((dynamic) node[1]);
+    }
+
+    public void Visit(Pow node) {
+        Visit((dynamic) node[0]);
+        Visit((dynamic) node[1]);
+    }
+
+    public void Visit(Int node) {
+        int value;
+        if (!Int32.TryParse(node.AnchorToken.Lexeme, out value)) {
+            throw new SemanticError(
+                $"Integer literal too large: {node.AnchorToken.Lexeme}");
+        }
+    }
+}
+
 public class Driver {
     public static void Main() {
         Console.Write("> ");
@@ -330,12 +365,17 @@ public class Driver {
         try {
             var result = parser.Prog();
             // Console.WriteLine(result.ToStringTree());
-            Console.WriteLine(new EvalVisitor().Visit((dynamic) result));
-            Console.WriteLine(new LispVisitor().Visit((dynamic) result));
-            Console.WriteLine(new CLangVisitor().Visit((dynamic) result));
+            // Console.WriteLine(new EvalVisitor().Visit((dynamic) result));
+            // Console.WriteLine(new LispVisitor().Visit((dynamic) result));
+            // Console.WriteLine(new CLangVisitor().Visit((dynamic) result));
+            new SemanticVisitor().Visit((dynamic) result);
+            Console.WriteLine("Semantics OK!");
         
         } catch (SyntaxError) {
             Console.WriteLine("Bad Syntax!");
+
+        } catch (SemanticError e) {
+            Console.WriteLine(e.Message);
         }
     }
 }
