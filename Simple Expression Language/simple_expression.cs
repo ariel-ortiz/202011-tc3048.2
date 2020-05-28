@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -402,7 +403,10 @@ public class Driver {
             // Console.WriteLine(new CLangVisitor().Visit((dynamic) result));
             new SemanticVisitor().Visit((dynamic) result);
             // Console.WriteLine("Semantics OK!");
-            Console.WriteLine(new WATVisitor().Visit((dynamic) result));
+            File.WriteAllText(
+                "output.wat",
+                new WATVisitor().Visit((dynamic) result)
+            );
 
         } catch (SyntaxError) {
             Console.WriteLine("Bad Syntax!");
