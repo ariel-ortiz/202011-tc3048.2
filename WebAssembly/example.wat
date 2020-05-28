@@ -2,12 +2,20 @@
 
 (module
   (import "math" "sin" (func $sin (param f32) (result f32)))
+  (global $timesCalled (import "globalVars" "timesCalled") (mut i32))
 
   (func
     ;; Function signature
     (export "duplicate")
     (param $x i32)
     (result i32)
+
+    ;; Increment the timesCalled global variable
+    ;; timesCalled++
+    global.get $timesCalled
+    i32.const 1
+    i32.add
+    global.set $timesCalled
 
     ;; Body of the function
     local.get $x
