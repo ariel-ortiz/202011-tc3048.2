@@ -1,6 +1,6 @@
 /*
  * Original grammar:
- * 
+ *
  *   Exp ::= Exp "+" Term   // Left recursion = left associativity (+)
  *   Exp ::= Term
  *   Term ::= Term "*" Pow  // Left recursion = left associativity (*)
@@ -47,7 +47,7 @@ public class Scanner {
     readonly String input;
     static readonly Regex regex = new Regex(
         @"(\d+)|([+])|([*])|(\^)|([(])|([)])|(\s)|(.)");
-        
+
     public Scanner(String input) {
         this.input = input;
     }
@@ -138,7 +138,7 @@ public class Parser {
         }
         return result;
     }
-    
+
     public Node Pow() {
         var result = Fact();
         if (Current == TokenCategory.POW) {
@@ -357,6 +357,38 @@ public class SemanticVisitor {
     }
 }
 
+public class WATVisitor {
+    public String Visit(Prog node) {
+        return
+            "(module\n"
+            + "  (import \"math\" \"pow\" (func $pow (param i32) (param i32) (result i32)))\n"
+            + "  (func\n"
+            + "    (export \"start\")\n"
+            + "    (result i32)\n"
+            + Visit((dynamic) node[0])
+            + "  )\n"
+            + ")\n";
+    }
+    public String Visit(Plus node) {
+        return Visit((dynamic) node[0])
+            + Visit((dynamic) node[1])
+            + "    i32.add\n";
+    }
+    public String Visit(Times node) {
+        return Visit((dynamic) node[0])
+            + Visit((dynamic) node[1])
+            + "    i32.mul\n";
+    }
+    public String Visit(Pow node) {
+        return Visit((dynamic) node[0])
+            + Visit((dynamic) node[1])
+            + "    call $pow\n";
+    }
+    public String Visit(Int node) {
+        return $"    i32.const {node.AnchorToken.Lexeme}\n";
+    }
+}
+
 public class Driver {
     public static void Main() {
         Console.Write("> ");
@@ -369,8 +401,9 @@ public class Driver {
             // Console.WriteLine(new LispVisitor().Visit((dynamic) result));
             // Console.WriteLine(new CLangVisitor().Visit((dynamic) result));
             new SemanticVisitor().Visit((dynamic) result);
-            Console.WriteLine("Semantics OK!");
-        
+            // Console.WriteLine("Semantics OK!");
+            Console.WriteLine(new WATVisitor().Visit((dynamic) result));
+
         } catch (SyntaxError) {
             Console.WriteLine("Bad Syntax!");
 
